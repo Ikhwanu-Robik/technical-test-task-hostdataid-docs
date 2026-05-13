@@ -1,26 +1,34 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
-import starlight from '@astrojs/starlight';
+import { defineConfig } from "astro/config";
+import starlight from "@astrojs/starlight";
+
+import mermaid from 'astro-mermaid';
+import expressiveCode from "astro-expressive-code";
 
 // https://astro.build/config
 export default defineConfig({
-	integrations: [
-		starlight({
-			title: 'My Docs',
-			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
-			sidebar: [
-				{
-					label: 'Guides',
-					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', slug: 'guides/example' },
-					],
-				},
-				{
-					label: 'Reference',
-					items: [{ autogenerate: { directory: 'reference' } }],
-				},
-			],
-		}),
-	],
+  integrations: [
+    expressiveCode(),
+    mermaid({
+      theme: "forest",
+      autoTheme: true,
+    }),
+    starlight({
+      title: "Dummy Top Up API",
+      sidebar: [
+        {
+          label: "Getting started",
+          slug: "index",
+        },
+        {
+          label: "System",
+          slug: "system",
+        },
+        {
+          label: "FAQ",
+          slug: "faq",
+        },
+      ],
+    }),
+  ],
 });

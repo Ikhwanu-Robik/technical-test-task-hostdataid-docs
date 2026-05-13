@@ -1,40 +1,73 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
-hero:
-  tagline: Congrats on setting up a new Starlight project!
-  image:
-    file: ../../assets/houston.webp
-  actions:
-    - text: Example Guide
-      link: /guides/example/
-      icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
-      icon: external
-      variant: minimal
+title: Dummy Top Up API
+description: A dummy top up API.
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+A backend API for a dummy top up system.
 
-## Next steps
+## Installation
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
-</CardGrid>
+1. Clone the project
+```bash
+git clone https://github.com/Ikhwanu-Robik/technical-test-task-hostdataid.git
+cd technical-test-task-hostdataid
+```
+
+2. Install dependencies
+```bash
+composer install
+```
+
+3. Copy .env.example
+```bash
+cp .env.example .env
+```
+
+4. Generate application key
+```bash
+php artisan key:generate
+```
+
+5. Configure database
+```dotenv title=".env"
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=technical-test-task-hostdataid
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+6. Start database server
+
+7. Run migration and seeder
+```bash
+php artisan migrate --seed
+```
+or import the **public/technical_test_task_hostdataid.sql** in your database
+
+8. Start php server
+```bash
+php artisan serve
+```
+
+## Testing
+
+### with local URL
+1. Download and open the **Postman Desktop App**.
+2. Click the **Import** button in the top-left sidebar.
+3. Paste this link: **https://www.postman.com/ikhwanu-robik/technical-test-hostdata-id/collection/m4cdrjd/technical-test-task-hostdata-id?action=share&source=copy-link&creator=43278751**.
+4. Confirm the import. The collection will appear in your sidebar under "Collections."
+5. Click on **Technical Test Task Hostdata.id**, a tab will open
+6. Click on **Variables**
+7. Change the **Current value** of the **host** variable to **127.0.0.1:8000**
+8. Select a request to be tested
+9. Change the body of the request to be tested
+10. Run the selected request
+
+### with live URL
+1. Open this [Postman collection](https://www.postman.com/ikhwanu-robik/technical-test-hostdata-id/collection/m4cdrjd/technical-test-task-hostdata-id?action=share&source=copy-link&creator=43278751)
+2. Sign in to your Postman account
+3. Select a request to be tested
+4. Change the body of the request to be tested
+5. Run the selected request

@@ -1,0 +1,103 @@
+---
+title: System
+description: how the system works
+---
+
+## The Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant App
+    actor Tester
+    participant Callback
+    participant DB as [Database] callback_logs
+
+    Note over User,App: Phase 1: Order Creation
+    User->>App: Send create order request
+    
+    alt is valid JSON?
+        App->>App: Validate JSON inputs
+        alt inputs are valid?
+            App->>App: Check rate limit (10s window)
+            alt not a duplicate?
+                App->>App: Create Order
+                App-->>User: Return order details
+            else is duplicate
+                App-->>User: Error: Duplicate request
+            end
+        else invalid inputs
+            App-->>User: Error: Invalid fields
+        end
+    else invalid JSON
+        App-->>User: Error: Bad Request format
+    end
+
+    Note over Tester,Callback: Phase 2: Callback Trigger
+    Tester->>App: Call callback trigger (ref_id, status)
+    
+    App->>App: Check status is valid
+    App->>App: Check order exists (ref_id)
+    
+    App->>Callback: Send request to callback
+    
+    Callback->>Callback: Check status is valid
+    Callback->>Callback: Check order exists (ref_id)
+    
+    Callback->>Callback: Update order status
+    Callback->>DB: Save request to callback_logs
+    Callback-->>App: Return success message
+```
+
+## The Database Structure
+
+<div style={{ width: '70%', margin: '0 auto' }}>
+```mermaid
+erDiagram
+    GAMES ||--o{ PRODUCTS : "game_id_foreign"
+    PRODUCTS ||--o{ ORDERS : "game_code_foreign"
+
+    CALLBACK_LOGS {
+        bigint id PK
+        json data
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    GAMES {
+        bigint id PK
+        varchar name
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PRODUCTS {
+        bigint id PK
+        varchar code UK
+        varchar name
+        bigint game_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ORDERS {
+        bigint id PK
+        varchar order_id
+        bigint user_id
+        varchar reference_id
+        varchar game_code FK
+        int amount
+        varchar status
+        timestamp created_at
+        timestamp updated_at
+    }
+```
+</div>
+
+## 10 Seconds Anti-Duplicate-Request
+
+When a user sends a request to create order, the app check the
+**orders** table in the database to see if there's any record with
+the same **reference_id** in the last 10 seconds. If there's any, the 
+app will return a 409 HTTP response.

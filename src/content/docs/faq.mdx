@@ -1,0 +1,79 @@
+---
+title: Frequently Asked Questions
+description: Frequently Asked Questions.
+---
+
+<details>
+<summary>Why did you choose the current database structure?</summary>
+<div style={{ width: '70%', margin: '0 auto' }}>
+```mermaid
+erDiagram
+    GAMES ||--o{ PRODUCTS : "game_id_foreign"
+    PRODUCTS ||--o{ ORDERS : "game_code_foreign"
+
+    CALLBACK_LOGS {
+        bigint id PK
+        json data
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    GAMES {
+        bigint id PK
+        varchar name
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PRODUCTS {
+        bigint id PK
+        varchar code UK
+        varchar name
+        bigint game_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ORDERS {
+        bigint id PK
+        varchar order_id
+        bigint user_id
+        varchar reference_id
+        varchar game_code FK
+        int amount
+        varchar status
+        timestamp created_at
+        timestamp updated_at
+    }
+```
+</div>
+A **game** may have many top up **products**, so they have a one-to-many relationships.
+A top up **product** may be purchased many times, so **product** has a one-to-many relationships with **orders**.
+The **callback_logs** only save a single real data that is a JSON, so in case the callback details changed, the **callback_logs** table do not need to be modified.
+</details>
+<details>
+<summary>How did your system prevent duplicate order in 10 seconds?</summary>
+When a user sends a request to create order, the app check the
+**orders** table in the database to see if there's any record with
+the same **reference_id** in the last 10 seconds. If there's any, the 
+app will return a 409 HTTP response.
+</details>
+<details>
+<summary>What happens if the callback is sent two requests of the same order?</summary>
+The specified order will have its status be set to the **callback_status** of the latter request.
+</details>
+<details>
+<summary>How did your system handle broken JSON or invalid fields?</summary>
+For a broken JSON, we have a middleware that will return a 400 HTTP response
+if it detects one. For the invalid fields, they are checked using Laravel's
+built-in input validation which throws AuthenticationException that we caught
+and we format to our custom JSON response format.
+</details>
+<details>
+<summary>If this system is to be used in a real production transaction, which parts would you need to upgrade?</summary>
+- First, the callback trigger must be removed since it is only for testing purpose.
+- Second, I would add a one-to-many relationship between **users** and **orders**.
+- Third, I would remove reference_id in the process of creating order because the client will be confused as to what to input.
+  Instead, I will protect the create order process with authentication middleware.
+  The anti-duplication system will use the user_id + game_code to determine duplicate order.
+</details>
